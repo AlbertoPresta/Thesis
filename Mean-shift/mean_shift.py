@@ -1,72 +1,62 @@
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import sys
+sys.path.append(os.getcwd() + "/Mean-shift")
+import Segmenter as segmenter
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
-from PIL import Image
 import time as time
-import math
-import sys
-
-def gaussian_mean(kernel,seed,bandwidth):
-	weights = np.exp(-1*np.linalg.norm((kernel - seed)/bandwidth,axis=1))
-	mean = np.array(np.sum(weights[:,None]*kernel,axis=0)/np.sum(weights), dtype=np.int64)
-	return mean
-
-threshold = 1.0
-bandwidth = 10
-Bin = 40
-kertype = "flat"
 
 
 
 
-img = Image.open("Mean-shift/images/vip.jpg")
-img.load()
-img = np.array(img)
 
-seg_img = img
-
-rows, cols, dim = img.shape
-rows
-m = 1
-S = 5
-meandist = np.array([[1000.0 for r in range(cols)] for c in range(rows)])
-labels = np.array([[-1 for r in range(cols)] for c in range(rows)])
-
-start = time.time()
-means = []
-for r in range(0,rows,Bin):
-	print(r)
-	for c in range(0,cols,Bin):
-		seed = np.array([r,c,img[r][c][0],img[r][c][1],img[r][c][2]])
-		for n in range(15):
-			print(n)
-			x = seed[0]
-			y = seed[1]
-			r1 = max(0,x - Bin)
-			r2 = min(r1 + Bin*2,rows)
-			c1 = max(0,y-Bin)
-			c2 = min(c1 + Bin*2,cols)
-			kernel = []
-			for i in range(r1,r2):
-				for j in range(c1,c2):
-					print(j)
-					dc = np.linalg.norm(img[i][j] - seed[2:])
-					ds = (np.linalg.norm(np.array([i,j]) - seed[:2]))*m/S
-					D = np.linalg.norm([dc,ds])
-					if D < bandwidth:
-						kernel.append([i,j,img[i][j][0],img[i][j][1],img[i][j][2]])
-			kernel = np.array(kernel)
-
-			mean = np.mean(kernel,axis = 0,dtype = np.int64)
-
-			# get the shift
-			dc = np.linalg.norm(seed[2:] - mean[2:])
-			ds = (np.linalg.norm(seed[:2] - mean[:2]))*m/S
-			dsm = np.linalg.norm([dc,ds])
-			seed = mean
-			if dsm <= threshold:
-				break
-		means.append(seed)
+s = segmenter.Segmenter("Mean-shift/images/vip3.jpg")
 
 
-end = time.time()
+
+
+
+ls, evolution = s.morphological_cv(number_of_iterations = 35)  # Active Contours Without Edges
+# print result of morhological_cv
+fig, axes = plt.subplots(2, 1, figsize=(8, 8))
+ax = axes.flatten()
+ax[0].imshow(s.image, cmap="gray")
+ax[0].set_axis_off()
+ax[0].contour(ls, [0.5], colors='r')
+ax[0].set_title("Morphological chan-vese segmentation", fontsize=12)
+ax[1].imshow(ls, cmap="gray")
+ax[1].set_axis_off()
+contour = ax[1].contour(evolution[1], [0.5], colors='g')
+contour.collections[0].set_label("Iteration 2")
+contour = ax[1].contour(evolution[-1], [0.5], colors='r')
+contour.collections[0].set_label("Last iteration")
+ax[1].legend(loc="upper right")
+title = "Morphological chan-vese evolution"
+ax[1].set_title(title, fontsize=12)
+plt.savefig("Mean-shift/results/_" + s.image_name + "_morhological_cv_segmentation.jpg")
+
+
+
+
+
+
+
+# Morphological GAC---> DOES NOT WORK (AS )
+ls, evolution = s.morphological_gac()
+fig, axes = plt.subplots(2, 1, figsize=(8, 8))
+ax = axes.flatten()
+ax[0].imshow(s.image, cmap="gray")
+ax[0].set_axis_off()
+ax[0].contour(ls, [0.5], colors='r')
+ax[0].set_title("Morphological gac segmentation", fontsize=12)
+ax[1].imshow(ls, cmap="gray")
+ax[1].set_axis_off()
+contour = ax[1].contour(evolution[1], [0.5], colors='g')
+contour.collections[0].set_label("Iteration 2")
+contour = ax[1].contour(evolution[-1], [0.5], colors='r')
+contour.collections[0].set_label("Last iteration")
+ax[1].legend(loc="upper right")
+title = "Morphological gac evolution"
+ax[1].set_title(title, fontsize=12)
+plt.savefig("Mean-shift/results/_" + s.image_name + "_morhological_gac_segmentation.jpg")
