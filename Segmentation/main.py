@@ -34,18 +34,9 @@ for im in img:
     cv = s.chan_vese()
 
 
-# normal_van_chese algorithm
-
-s = segmenter.Segmenter("Segmentation/images/vip3.jpg")
-cv = s.chan_vese()
 
 
-
-
-c,d,e = s.Otzu_thresholding()
-
-
-
-
-ls, evolution = s.morphological_cv(number_of_iterations = 35)  # Active Contours Without Edges
-# print result of morhological_cv
+for im in img:
+    print(im)
+    s = segmenter.Segmenter(im)
+    cv = s.kmeans(2)

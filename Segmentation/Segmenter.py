@@ -17,6 +17,7 @@ from skimage import data
 from skimage import filters
 from skimage import exposure
 from skimage.segmentation import chan_vese
+from sklearn.cluster import KMeans
 
 
 def store_evolution_in(lst):
@@ -44,6 +45,33 @@ class Segmenter:
 
     def plot_gray_image(self):
         plt.imshow(self.gray_image)
+
+
+    def kmeans(self,nb_of_cluster,save = True):
+        pic = plt.imread(self.image_pt)/255  # dividing by 255 to bring the pixel values between 0 and 1
+        pic_n = pic.reshape(pic.shape[0]*pic.shape[1], pic.shape[2]) # convert in 2-D
+        kmeans = KMeans(n_clusters=nb_of_cluster, random_state=0).fit(pic_n)
+        pic2show = kmeans.cluster_centers_[kmeans.labels_]
+        cluster_pic = pic2show.reshape(pic.shape[0], pic.shape[1], pic.shape[2])
+
+        if(save == True):
+            fig, axes = plt.subplots(1, 2, figsize=(8, 8))
+            ax = axes.flatten()
+
+            ax[0].imshow(self.image)
+            ax[0].set_axis_off()
+            ax[0].set_title("Original Image", fontsize=12)
+
+            ax[1].imshow(cluster_pic)
+            ax[1].set_axis_off()
+            title = "Kmeans implementation with - {} cluster".format(nb_of_cluster)
+            ax[1].set_title(title, fontsize=12)
+
+            fig.tight_layout()
+            plt.savefig("Segmentation/results/kmeans/_" + self.image_name + "_.jpg")
+            plt.show()
+
+
 
     def Otzu_thresholding(self, save = True ):
         #this function also print and save results
