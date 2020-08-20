@@ -40,3 +40,10 @@ for im in img:
     print(im)
     s = segmenter.Segmenter(im)
     cv = s.kmeans(2)
+
+
+
+for im in img:
+    print(im)
+    s = segmenter.Segmenter(im)
+    s.mean_shift()

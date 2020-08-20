@@ -17,7 +17,10 @@ from skimage import data
 from skimage import filters
 from skimage import exposure
 from skimage.segmentation import chan_vese
-from sklearn.cluster import KMeans
+from sklearn.cluster import KMeans, MeanShift, estimate_bandwidth
+from sklearn.datasets import make_blobs
+from itertools import cycle
+from PIL import Image
 
 
 def store_evolution_in(lst):
@@ -169,3 +172,35 @@ class Segmenter:
     def quickshift(self, kernel_size=3, max_dist=60, ratio=0.5):
         res = quickshift(self.image, kernel_size = kernel_size, max_dist=max_dist, ratio=ratio)
         return res
+
+
+
+    def mean_shift(self,save = True):
+        img = Image.open(self.image_pt)
+        img = img.resize((2000,1339),Image.ANTIALIAS)
+        img = np.array(img)
+
+        #Need to convert image into feature array based
+        flatten_img=np.reshape(img, [-1, 3])
+        #bandwidth estimation
+        est_bandwidth = estimate_bandwidth(flatten_img, quantile=.2, n_samples=500)
+        est_bandwidth
+        mean_shift = MeanShift(est_bandwidth, bin_seeding=True)
+        mean_shift.fit(flatten_img)
+        ms_labels = mean_shift.labels_
+        if(save):
+            fig, axes = plt.subplots(1, 2, figsize=(8, 8))
+            ax = axes.flatten()
+
+            ax[0].imshow(img)
+            ax[0].set_axis_off()
+            ax[0].set_title("Original Image", fontsize=12)
+
+            ax[1].imshow(np.reshape(ms_labels, [img.shape[0],img.shape[1]]))
+            ax[1].set_axis_off()
+            title = "mean shift segmentation"
+            ax[1].set_title(title, fontsize=12)
+
+            fig.tight_layout()
+            plt.savefig("Segmentation/results/mean_shift/_" + self.image_name + "_.jpg")
+            plt.show()

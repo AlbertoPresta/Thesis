@@ -2,6 +2,63 @@ import pandas as pd
 import numpy as np
 import cv2
 import os
+import matplotlib.pyplot as plt
+from sklearn.cluster import MeanShift, estimate_bandwidth
+from sklearn.datasets import make_blobs
+from itertools import cycle
+from PIL import Image
+
+os.listdir()
+
+#Segmentation of Color Image
+img = Image.open('Segmentation/images/vip3.jpg')
+img = img.resize((2000,1339),Image.ANTIALIAS)
+img = np.array(img)
+img.shape[0]
+plt.imshow(img)
+#Need to convert image into feature array based
+flatten_img=np.reshape(img, [-1, 3])
+#bandwidth estimation
+est_bandwidth = estimate_bandwidth(flatten_img, quantile=.2, n_samples=500)
+est_bandwidth
+mean_shift = MeanShift(est_bandwidth, bin_seeding=True)
+mean_shift.fit(flatten_img)
+
+
+ms_labels
+ms_labels = mean_shift.labels_
+c_centers = mean_shift.cluster_centers_
+n_clusters_ = ms_labels.max()+1
+
+
+int(2000*3424/5112)
+
+
+import matplotlib.pyplot as plt
+from itertools import cycle
+
+
+plt.subplot(1, 1, 1)
+plt.imshow(img)
+plt.axis('off')
+plt.subplot(1, 1, 2)
+plt.imshow(np.reshape(ms_labels, [1339,2000]))
+
+
+
+plt.figure(1)
+plt.clf()
+
+colors = cycle('bgrcmykbgrcmykbgrcmykbgrcmyk')
+for k, col in zip(range(n_clusters_), colors):
+    my_members = ms_labels == k
+    cluster_center = c_centers[k]
+    plt.plot(flatten_img[my_members, 0], flatten_img[my_members, 1], col + '.')
+    plt.plot(cluster_center[0], cluster_center[1], 'o', markerfacecolor=col,
+             markeredgecolor='k', markersize=14)
+plt.title('Estimated number of clusters: %d' % n_clusters_)
+plt.show()
+
 
 
 hs = 8 #spatial bandwidth
@@ -9,7 +66,7 @@ hr= 7   # range bandwidth
 threshold_convergence_mean = 0.25
 bandwidth=[hs,hr]
 
-
+from cluster import MeanShift, estimate_bandwidth
 
 def rgb2luv(R,G,B):
     var_r = double(R)/255
