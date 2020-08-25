@@ -20,6 +20,10 @@ for im in img:
     s = segmenter.Segmenter(im)
     cv = s.morphological_cv(number_of_iterations = 20)
 
+
+
+
+
 # normal chan vese algorithm
 for im in img:
     print(im)
