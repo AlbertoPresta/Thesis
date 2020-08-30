@@ -269,7 +269,7 @@ time0 = time.time()
     # read image
 #img = io.imread('M2.pgm',as_gray=True)
 
-img = io.imread('Segmentation/images/vip6.jpg',as_gray = True)
+img = io.imread('Segmentation/images/vip5.jpg',as_gray = True)
 img[:,:].shape
 img= resize(img, (img.shape[0]//3, img.shape[1]//3),
 anti_aliasing=True)
@@ -296,7 +296,7 @@ plt.imshow(Ig[:,:,0])
 # include original image as one band
 #Ig = np.concatenate((np.float32(img.reshape((img.shape[0], img.shape[1], img.shape[2]))), filter_out), axis=2)
 
-seg_out = Fseg(Ig, ws=25, segn=0, omega=.1, nonneg_constraint=True)
+seg_out = Fseg(Ig, ws=25, segn=2, omega=.089, nonneg_constraint=True)
 
 print('FSEG runs in %0.2f seconds. ' % (time.time() - time0))
 
