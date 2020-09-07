@@ -21,13 +21,30 @@ filter_list = [('log', .5,[3,3]), ('log', 1,[5,5]),
 
 
 
-p = filters.filters("Segmentation/images/vip5.jpg",filter_list)
 
-Ig = p.image_filtering()
+images = os.listdir("Segmentation/images/")
+images = ["Segmentation/images/" + im for im in images]
 
-plt.imshow(Ig[:,:,0])
 
-a = fbseg.FB_seg(Ig,"Segmentation/images/vip5.jpg")
+
+for im in images:
+    print(im)
+    p = filters.filters(im,filter_list)
+    Ig = p.image_filtering()
+    print("image ",im.split("/")[-1], " filtered")
+    a = fbseg.FB_seg(Ig,im)
+    seg_out = a.Fseg()
+    print("image ",im.split("/")[-1]," segmented")
+    a.plot_and_save_results(seg_out)
+
+
+
+
+
+
+a = fbseg.FB_seg(Ig,"Segmentation/images/vip.jpg")
+
+
 
 seg_out = a.Fseg()
 

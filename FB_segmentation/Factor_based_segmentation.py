@@ -9,6 +9,7 @@ from skimage import io, color
 from skimage.transform import rescale, resize, downscale_local_mean
 from scipy import ndimage as ndi
 import os
+from skimage.transform import rescale, resize, downscale_local_mean
 
 
 class FB_seg:
@@ -35,7 +36,7 @@ class FB_seg:
         :return: local spectral histogram at each pixel
         """
         h, w, bn = self.Ig.shape
-        # quantize values at each pixel into bin ID
+        # quantize values at each pixel into bin ID--> in ogni pixel verrà salvato il bin corrispondente
         for i in range(bn):
             b_max = np.max(self.Ig[:, :, i])
             b_min = np.min(self.Ig[:, :, i])
@@ -53,6 +54,9 @@ class FB_seg:
             one_hot_pix_b = np.zeros((h*w, BinN), dtype=np.int32)
             one_hot_pix_b[np.arange(h*w), self.Ig[:, :, i].flatten()] = 1
             one_hot_pix.append(one_hot_pix_b.reshape((h, w, BinN)))
+
+        #one_hot_pix[i] ti da esattamente i bin (sottoforma di one-hot encoding) della prima riga, pixel by pixel
+
 
         # compute integral histogram
         integral_hist = np.concatenate(one_hot_pix, axis=2)
@@ -128,13 +132,13 @@ class FB_seg:
 
         if self.segn == 0:  # estimate the segment number
             lse_ratio = np.cumsum(k) * 1. / (N1 * N2)
-            print(np.sum(k)/(N1 * N2))
+            #print(np.sum(k)/(N1 * N2))
             self.segn = np.sum(lse_ratio > self.omega)
-            print('Estimated segment number: %d' % self.segn)
+            #print('Estimated segment number: %d' % self.segn)
 
             if self.segn <= 1:
                 self.segn = 2
-                print('Warning: Segment number is set to 2. May need to reduce omega for better segment number estimation.')
+                #print('Warning: Segment number is set to 2. May need to reduce omega for better segment number estimation.')
 
         dimn = self.segn
 
@@ -202,7 +206,7 @@ class FB_seg:
 
                 d = Y.T - np.dot(w, h)
                 dnorm = np.sqrt(np.mean(d * d))
-                print(i, np.abs(dnorm - dnorm0), dnorm)
+                #print(i, np.abs(dnorm - dnorm0), dnorm)
                 if np.abs(dnorm - dnorm0) < .1:
                     break
 
@@ -217,9 +221,12 @@ class FB_seg:
 
 
 
-    def plot_and_save_results(self, seg_out):
+    def plot_and_save_results(self, seg_out,resized = True):
         print("FB_segmentation/results/_fbseg_" + os.path.basename(self.image_name))
         img = io.imread(self.image_name,as_gray = True)
+        if(resized == True and(img.shape[0]>2000 or img.shape[1]>2000)):
+            img= resize(img, (img.shape[0]//3, img.shape[1]//3),anti_aliasing=True)
+        
         fig, ax = plt.subplots(ncols=2, sharex=True, sharey=True, figsize=(12, 6))
         ax[0].imshow(img, cmap='gray')
         ax[1].imshow(seg_out, cmap='gray')

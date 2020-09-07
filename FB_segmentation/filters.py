@@ -30,9 +30,9 @@ class filters:
 
 
 
-    def __init__(self, image_path, filters_list):
+    def __init__(self, image_path, filters_list,resized = True):
         self.image = io.imread(image_path,as_gray = True)
-        if(self.image.shape[0]>2000 or self.image.shape[1]>2000):
+        if(resized == True and(self.image.shape[0]>2000 or self.image.shape[1]>2000)):
             self.image= resize(self.image, (self.image.shape[0]//3, self.image.shape[1]//3),anti_aliasing=True)
         self.image_path = image_path
         self.filters_list = filters_list
