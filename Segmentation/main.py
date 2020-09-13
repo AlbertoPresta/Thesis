@@ -9,26 +9,28 @@ import time as time
 from skimage.segmentation import mark_boundaries
 
 
-img = os.listdir("Segmentation/images/")
-img = ["Segmentation/images/" + i for i in img]
+img = os.listdir("super/")
+img = ["super/" + i for i in img]
 
 img
 
 # normal chan vese algorithm
-for im in img:
-    print(im)
-    s = segmenter.Segmenter(im)
-    cv = s.morphological_cv(number_of_iterations = 20)
+for l in img:
+    for i in os.listdir(l):
+        print(l + "/" + i)
+        s = segmenter.Segmenter(l + "/" + i)
+        cv = s.morphological_cv(number_of_iterations = 20)
 
 
 
 
 
 # normal chan vese algorithm
-for im in img:
-    print(im)
-    s = segmenter.Segmenter(im)
-    cv = s.Otzu_thresholding()
+for l in img:
+    for i in os.listdir(l):
+        print(l + "/" + i)
+        s = segmenter.Segmenter(l + "/" + i)
+        cv = s.Otzu_thresholding()
 
 
 
