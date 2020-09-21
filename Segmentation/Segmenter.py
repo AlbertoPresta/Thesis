@@ -21,6 +21,49 @@ from sklearn.cluster import KMeans, MeanShift, estimate_bandwidth
 from sklearn.datasets import make_blobs
 from itertools import cycle
 from PIL import Image
+import matplotlib.patches as mpatches
+from scipy.ndimage.morphology import binary_erosion
+from skimage.segmentation import clear_border
+from skimage.color import label2rgb
+from skimage.measure import label, regionprops
+
+def create_bounded_boxes(or_img, segmented_img,number_of_boxes = 100):
+    segmented_img = binary_erosion(segmented_img, structure=np.ones((5,5))).astype(segmented_img[0].dtype)
+    #Clear objects connected to the label image border--> nessun lichene attaccato al bordo
+    cleared = clear_border(segmented_img)
+    # label image regions
+    label_image = label(cleared)
+    # to make the background transparent, pass the value of `bg_label`,
+    # and leave `bg_color` as `None` and `kind` as `overlay`
+    image_label_overlay = label2rgb(label_image, image=segmented_img, bg_label=0) #Return an RGB image where color-coded labels are painted over the image.
+    boxes = []
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.imshow(or_img)
+    for region in regionprops(label_image):
+        cont = 1
+        # take regions with large enough areas
+        if region.area >= 1000:
+            # draw rectangle around segmented coins
+            minr, minc, maxr, maxc = region.bbox
+            area = region.area
+            boxes.append({"reg":cont, "area":area,"minr":minr,"minc":minc,"maxr":maxr,"maxc":maxc})
+            cont = cont + 1
+    newbox = sorted(boxes, key=lambda k: k['area'],reverse=True)
+
+    for i in range(min(len(newbox),number_of_boxes)):
+        bbox = newbox[i]
+        minr = bbox['minr']
+        minc = bbox['minc']
+        maxr = bbox['maxr']
+        maxc = bbox['maxc']
+        rect = mpatches.Rectangle((minc, minr), maxc - minc, maxr - minr,fill=False, edgecolor='red', linewidth=2)
+        ax.add_patch(rect)
+
+    ax.set_axis_off()
+    plt.tight_layout()
+    plt.show()
+
+    return newbox[:number_of_boxes]
 
 
 def store_evolution_in(lst):

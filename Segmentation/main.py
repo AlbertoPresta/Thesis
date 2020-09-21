@@ -6,15 +6,17 @@ import Segmentation.Segmenter as segmenter
 import numpy as np
 import matplotlib.pyplot as plt
 import time as time
-from skimage.segmentation import mark_boundaries
 
 
-img = os.listdir("super/")
-img = ["super/" + i for i in img]
 
-img
 
-# normal chan vese algorithm
+img = os.listdir("Licheni/super/")
+img = ["Licheni/super/" + i for i in img]
+
+
+
+
+
 for l in img:
     for i in os.listdir(l):
         print(l + "/" + i)
