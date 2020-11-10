@@ -120,21 +120,13 @@ def total_feature(img_path, size,level = 3, bins = 16, distance = [1], direction
     for i in x_sizes:
         for j in y_sizes:
             im = img[i:i + size,j:j+size,:]
-            #legendre = Legendre_vector(im,level)
+            legendre = Legendre_vector(im,level)
             histograms = color_hist_vector(im,  bins = bins)
-            #co_occurrence = co_occurrence_vector(im,distance = distance, direction = direction)
+            co_occurrence = co_occurrence_vector(im,distance = distance, direction = direction)
             res.append(histograms)
-            #res.append(np.concatenate([histograms,co_occurrence]))
-    # calcolo la media
-    res = np.array(res)
-    media =  np.zeros(48)
-    for jj in range(res.shape[1]):
-        tmp = np.zeros(256)
-        for ii in range(res.shape[0]):
-            tmp[ii] = res[ii,jj]
-        media[jj] = np.mean(tmp)
+            res.append(np.concatenate([histograms,co_occurrence]))
 
-    return res, media
+    return res
 
 
 

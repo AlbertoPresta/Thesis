@@ -3,9 +3,9 @@ import matplotlib.pyplot as plt
 import PIL
 from PIL import  Image
 import cv2
-import dog
-import generate_descriptor
-import find_extrema
+from descriptor.Dense_sift import dog
+from descriptor.Dense_sift import generate_descriptor
+from descriptor.Dense_sift import find_extrema
 import numpy as np
 
 

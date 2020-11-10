@@ -3,7 +3,7 @@ from numpy.linalg import det, lstsq, norm
 from cv2 import resize, GaussianBlur, subtract, KeyPoint, INTER_LINEAR, INTER_NEAREST
 from functools import cmp_to_key
 import logging
-import find_extrema
+from descriptor.Dense_sift import find_extrema
 
 logger = logging.getLogger(__name__)
 float_tolerance = 1e-7
