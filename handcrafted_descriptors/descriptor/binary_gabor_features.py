@@ -148,10 +148,7 @@ def GetMaping(bitNo):
 
 
 
-def BGF(img,center_x,center_y,size,halflngt = 17, all = False):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #img = cv2.imread(img_path,0)
-    #img = cv2.resize(img,(512,512))
+def BGF(img, center_x, center_y, size, halflngt = 17, all = False):
     if (all == False):
         print("SONO QUA")
         left_x = max(0,center_y - size)
@@ -164,7 +161,6 @@ def BGF(img,center_x,center_y,size,halflngt = 17, all = False):
     mapping = GetMaping(8)
     rows = img.shape[0]
     cols = img.shape[1]
-    #print("due: ",img.shape)
     GA = gaborArray(rows, cols,halfLength = halflngt)
     halfLength = halflngt
     filterRows = 2*halfLength + 1
@@ -221,35 +217,3 @@ def BGF(img,center_x,center_y,size,halflngt = 17, all = False):
 
 
 
-
-def calculate_BGF_mean(img, size,halfLength = 5):
-    #imag = cv2.imread(img)
-    #imag = cv2.resize(imag,(resizing,resizing))
-    imag = crop_image(img)
-
-    centers_x = np.arange(size//2,imag.shape[0],size)
-    centers_y = np.arange(size//2,imag.shape[1],size)
-    bgf_vectors = np.zeros(216)
-    cont = 0
-    for xx in centers_x:
-        for yy in centers_y:
-            if cont == 0:
-                bgf_vectors = BGF(imag,yy,xx,size//2,halflngt = halfLength)
-                print("lunghezza",bgf_vectors.shape)
-                cont = cont +1
-            else:
-                temp = BGF(imag,yy,xx,size//2,halflngt = halfLength)
-                bgf_vectors = np.concatenate([bgf_vectors,temp])
-                cont = cont +1
-    bgf_vectors_res = bgf_vectors.reshape(-1)
-    print("+++++++++++++++, ",bgf_vectors.shape)
-    return bgf_vectors_res,bgf_vectors
-
-
-
-
-
-
-
-#%%time
-#bgf_vectors,res = calculate_BGF_mean("../prova2.jpg", 20)

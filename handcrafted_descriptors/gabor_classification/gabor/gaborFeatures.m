@@ -1,4 +1,4 @@
-function featureVector = gaborFeatures(img)
+function featureVector = gaborFeatures(img, orient, scales)
 
 % GABORFEATURES extracts the Gabor features of an input image.
 % It creates a column vector, consisting of the Gabor features of the input
@@ -37,21 +37,16 @@ function featureVector = gaborFeatures(img)
 % (C)	Mohammad Haghighat, University of Miami
 %       haghighat@ieee.org
 %       PLEASE CITE THE ABOVE PAPER IF YOU USE THIS CODE.
-disp('--------')
-disp('immagine')
-if (nargin ~= 1)        % Check correct number of arguments
-    error('Please use the correct number of input arguments!')
-end
+
 
 %if size(img,3) == 3     % Check if the input image is grayscale
 %    warning('The input RGB image is converted to grayscale!')
 %    img = rgb2gray(img);
 %end
-gaborArray = gaborFilterBank(8,8,39,39); 
+gaborArray = gaborFilterBank(orient,scales,39,39); 
 
-disp('-----')
-c = gaborArray{1,1};
-disp('????')
+
+
 img = double(img);
 
 img_r = img(:,:,1);

@@ -10,9 +10,9 @@ import matplotlib.pyplot as plt
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC, SVC
 from sklearn.metrics import confusion_matrix
-from grid_classification import kernels as krn
-from grid_classification import accuracy_and_test as aat
-from grid_classification import utils
+from handcrafted_descriptors.grid_classification import kernels as krn
+from handcrafted_descriptors.grid_classification import accuracy_and_test as aat
+from handcrafted_descriptors.grid_classification import utils
 from sklearn import metrics
 from sklearn.metrics import precision_recall_fscore_support
 import pandas as pd
@@ -22,7 +22,7 @@ import pickle
 extract training features and labels
 """
 
-species[8]
+
 
 species = ['Arthonia_radiata','Caloplaca_cerina','Candelariella_reflexa','Candelariella_xanthostigma','Chrysothrix_candelaris','Flavoparmelia_caperata','Gyalolechia_flavorubescens','Hyperphyscia_adglutinata'
         ,'Lecanora_argentata','Lecanora_chlarotera','Lecidella_elaeochroma','Melanelixia_glabratula'
@@ -58,10 +58,7 @@ def equal(a,b):
             return False
     return True
 
-for i,t in enumerate(tst_features):
-    print(t.shape)
-    if(equal(t,tst_features[i])==True):
-        print(i)
+
 
 
 
@@ -99,15 +96,15 @@ prec = []
 rec = []
 
 
+os.listdir('../')
+trf = '../features_for_python/features_pf_400_8_rbf/training_features.mat'
+trlab = '../features_for_python/features_pf_400_8_rbf/training_lab_features.mat'
 
-trf = '../features_for_python/features_pf_450_8_rbf/training_features.mat'
-trlab = '../features_for_python/features_pf_450_8_rbf/training_lab_features.mat'
+tstf = '../features_for_python/features_pf_400_8_rbf/testing_features.mat'
+tstlab = '../features_for_python/features_pf_400_8_rbf/testing_lab_features.mat'
 
-tstf = '../features_for_python/features_pf_400_8_rbf_classic_sift/testing_features.mat'
-tstlab = '../features_for_python/features_pf_400_8_rbf_classic_sift/testing_lab_features.mat'
-
-vldf = '../features_for_python/features_pf_400_8_rbf/validate_features.mat'
-cldlab = '../features_for_python/features_pf_400_8_rbf/validate_lab_features.mat'
+#vldf = '../features_for_python/features_pf_400_8_rbf/validate_features.mat'
+#cldlab = '../features_for_python/features_pf_400_8_rbf/validate_lab_features.mat'
 
 training_feat,tr_lab = load_descriptor_from_matfile(trf, trlab)
 tst_features, tst_lab = load_descriptor_from_matfile(tstf,tstlab)
@@ -117,7 +114,9 @@ tst_lab = tst_lab -1
 validate_lab = validate_lab - 1
 
 svm, mean, gram = define_and_train_svm(training_feat,tr_lab,'rbf',distance = None)
-linear_score = svm.score(validate_features,validate_lab)
+linear_score = svm.score(tst_features,tst_lab)
+
+linear_score
 
 pred = svm.predict(tst_features)
 
@@ -136,7 +135,10 @@ fig=plt.figure(figsize=(30, 15))
 utils.plot_confusion_matrix(cm,species,"Phow_descriptors_8_chisquared_"+c+'_',"grid_classification/results/confusion_matrix/",normalize=False,title='Confusion matrix')
 precision, recall, fbeta, support = precision_recall_fscore_support(tst_lab, pred)
 
-for c in ['400']:
+for c in ['300','350','400','450','450']:
+    print("-----------------------------")
+    print(c)
+    print("------------------------------")
 
 
     trf = '../features_for_python/features_pf_' + c + '_8_rbf/training_features.mat'
@@ -145,26 +147,29 @@ for c in ['400']:
     tstf = '../features_for_python/features_pf_' + c + '_8_rbf/testing_features.mat'
     tstlab = '../features_for_python/features_pf_' + c + '_8_rbf/testing_lab_features.mat'
 
-    vldf = '../features_for_python/features_pf_400_8_rbf/validate_features.mat'
-    vldlab = '../features_for_python/features_pf_400_8_rbf/validate_lab_features.mat'
+    vldf = '../features_for_python/features_pf_' + c + '_8_rbf/validate_features.mat'
+    vldlab = '../features_for_python/features_pf_' + c + '_8_rbf/validate_lab_features.mat'
 
     training_feat,tr_lab = load_descriptor_from_matfile(trf, trlab)
     tst_features, tst_lab = load_descriptor_from_matfile(tstf,tstlab)
-    validate_features, validate_lab = load_descriptor_from_matfile(vldf,cldlab)
+    validate_features, validate_lab = load_descriptor_from_matfile(vldf,vldlab)
     tr_lab = tr_lab -1
     tst_lab = tst_lab -1
-    validate_lab = validate_lab - 1
+    #validate_lab = validate_lab - 1
+    svm, mean, gram = define_and_train_svm(training_feat,tr_lab,'rbf',distance = None)
+    linear_score = svm.score(tst_features,tst_lab)
 
+    print('LINEAR_SCORE: ',linear_score)
     svm, mean, gram = define_and_train_svm(training_feat,tr_lab,'precomputed',distance = krn.chisquared_distance)
     t,pred = test_accuracy(tst_features, training_feat, krn.chisquared_kernel, mean, tst_lab ,svm)
     tt,_ = test_accuracy(validate_features, training_feat, krn.chisquared_kernel, mean, validate_lab ,svm)
     print('-------> ', tt, '-----------------')
-    filename = 'grid_classification/model/finalized_model.sav'
+    filename = 'handcrafted_descriptors/grid_classification/model/finalized_model.sav'
     pickle.dump(svm, open(filename, 'wb'))
-    pickle.dump(mean,open('grid_classification/model/mean.sav','wb'))
+    pickle.dump(mean,open('handcrafted_descriptors/grid_classification/model/mean.sav','wb'))
 
-    pickle.dump(training_feat, open('grid_classification/model/training.sav', 'wb'))
-    pickle.dump(mean,open('grid_classification/model/mean.sav','wb'))
+    pickle.dump(training_feat, open('handcrafted_descriptors/grid_classification/model/training.sav', 'wb'))
+    pickle.dump(mean,open('handcrafted_descriptors/grid_classification/model/mean.sav','wb'))
     acc.append(t)
     print('accuracy: ',t)
 
@@ -175,7 +180,7 @@ for c in ['400']:
     df = utils.evaluated_prediction(pred, tst_lab, species)
     cm = utils.build_confusion_matrix(df, pred, tst_lab,species)
     fig=plt.figure(figsize=(30, 15))
-    utils.plot_confusion_matrix(cm,species,"Phow_descriptors_8_chisquared_"+c+'_',"grid_classification/results/confusion_matrix/",normalize=True,title='Confusion matrix')
+    utils.plot_confusion_matrix(cm,species,"Phow_descriptors_8_chisquared_"+c+'_',"handcrafted_descriptors/grid_classification/results/confusion_matrix/",normalize=True,title='Confusion matrix')
     precision, recall, fbeta, support = precision_recall_fscore_support(tst_lab, pred)
     prec.append(precision)
     rec.append(recall)

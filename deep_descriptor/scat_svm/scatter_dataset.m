@@ -46,6 +46,8 @@ while hasdata(ds)
     [scattered_image_2,~] = format_scat(scat(I2,Wop));
     [scattered_image_3,~] = format_scat(scat(I3,Wop));
     
+    
+    
     scattered_image = [scattered_image_1 ; scattered_image_2 ; scattered_image_3];
     
 
@@ -53,7 +55,9 @@ while hasdata(ds)
 
     
     filename = strcat(int2str(c),'.mat');
+    
     c = c+1;
     save(strcat(name_new_folder,'/',label,'/',filename),'scattered_image');
+    disp(strcat(name_new_folder,'/',label,'/',filename))
     
 end
