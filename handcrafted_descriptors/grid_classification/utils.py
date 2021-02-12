@@ -77,7 +77,7 @@ def plot_confusion_matrix(cm, classes,string,directory,normalize=False,title='Co
     """
     if normalize:
         cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-
+    plt.figure(figsize = (15,15))
     plt.imshow(cm, cmap=plt.cm.Blues)
     plt.title(title)
     plt.colorbar()
@@ -88,7 +88,7 @@ def plot_confusion_matrix(cm, classes,string,directory,normalize=False,title='Co
     fmt = '.2f' if normalize else 'd'
     thresh = cm.max() / 2.
     for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
-        if(i==j):
+        if(i==j or cm[i,j] > 0.05):
             plt.text(j, i, format(cm[i, j], fmt),
                      horizontalalignment="center",
                      color="white" if cm[i, j] > thresh else "black")
