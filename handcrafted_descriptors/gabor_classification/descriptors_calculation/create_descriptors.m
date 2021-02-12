@@ -9,7 +9,7 @@ imds_train = imageDatastore(setdir_train, 'IncludeSubFolders',true,'LabelSource'
 setdir_test = '/Users/admin/Desktop/tesi/data/valid';
 imds_test = imageDatastore(setdir_test, 'IncludeSubFolders',true,'LabelSource','foldernames');
 
-path = '/Users/admin/Desktop/tesi/Thesis/handcrafted_descriptors/gabor_classification/gabor';
+path = '/Users/admin/Desktop/tesi/Thesis/handcrafted_descriptors/gabor_classification/descriptors_calculation/gabor';
 addpath(path);
 
 
@@ -25,8 +25,8 @@ lab_dict = containers.Map(labels,train_lab);
 train_pth = imds_train.Files;
 lab_pth = cellstr(imds_train.Labels);
 
-img_filename = 'dsc/training_descriptors';
-lab_filename = 'dsc/training_labels' ;
+img_filename = '../dsc/training_descriptors';
+lab_filename = '../dsc/training_labels' ;
 
 
 %[dsc,lab] = calculate_descriptors(train_pth, lab_pth,img_filename, lab_filename,lab_dict);

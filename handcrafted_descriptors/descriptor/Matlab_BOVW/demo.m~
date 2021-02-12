@@ -1,0 +1,113 @@
+clear all 
+clc
+%%
+run('../vlfeat/toolbox/vl_setup')
+%%
+if isempty(gcp)
+     parpool;
+end
+
+%% 
+setdir_train  = fullfile('..','..','..','..','mnt','workdata','presta','data','train');
+setdir_test  = fullfile('..','..','..','..','mnt','workdata','presta','data','valid');
+
+imds_train = imageDatastore(setdir_train, 'IncludeSubFolders', true, 'LabelSource','foldernames');
+imds_valid = imageDatastore(setdir_test, 'IncludeSubFolders', true, 'LabelSource','foldernames');
+
+   
+labels = cellstr(unique(imds_train.Labels));
+    train_lab = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+    lab_dict = containers.Map(labels, train_lab);
+
+
+ 
+
+
+%%
+tic
+vocsize = [500];
+
+for vc = vocsize
+
+    disp('------------------------------')
+    disp(vc)
+    extractor = @scalepropagationsift; 
+    bag = bagOfFeatures(imds_train, 'CustomExtractor',extractor, 'VocabularySize',vc, 'StrongestFeatures',1);
+    
+    savename = fullfile('..','..','..','..','mnt','workdata','presta','had_craft_descriptors','bag',strcat('bag_of_words_scale_image64'));
+    save(savename, 'bag'); 
+end
+
+
+
+% create python descriptors 
+vis = [500];
+%validdir = fullfile('..','..','..','..','mnt','workdata','presta','data','valid');
+%validimds = imageDatastore(validdir, 'IncludeSubFolders', true, 'LabelSource','foldernames');
+for v = vis
+   
+    clc
+    disp('*********************************************')
+    disp(v)
+    disp('***********************************************')
+    vis = v;
+    visstr = string(vis);
+    bag =  load(fullfile('..','..','..','..','mnt','workdata','presta','had_craft_descriptors','bag',strcat('bag_of_words_scale_image64')));
+    bag = bag.bag
+
+    labels = cellstr(unique(imds_train.Labels));
+    train_lab = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20};
+    lab_dict = containers.Map(labels, train_lab);
+
+
+
+    folder = fullfile('..','..','..','..','mnt','workdata','presta','had_craft_descriptors',...
+                  'features_for_python',strcat('image_',visstr,'_64'));
+
+           
+              
+    [train_features, training_labels] = extract_feature_for_python(imds_train, bag, vis, folder, 0,lab_dict);
+
+    disp('------------------------------------------------------------------------------------')
+    [tst, tst_lbs] = extract_feature_for_python(imds_valid, bag, vis, folder, 1,lab_dict);
+    
+
+                                
+end
+                           
+%% 
+img = readimage(imds_valid,57);
+size(img)
+figure
+image(img)
+%%
+sImage1 = im2single(img(:,:,1));
+sImage2 = im2single(img(:,:,2));
+sImage3 = im2single(img(:,:,3));
+gray_img = rgb2gray(img);
+gray_img = im2single(gray_img);
+proptype = 'image-aware';
+weight_func = 'linear';
+[F1, ~] = vl_sift(sImage1);
+[F2, ~] = vl_sift(sImage2);
+[F3, ~] = vl_sift(sImage3);
+newF1 = propagateScales(proptype, F1, sImage1, weight_func );
+newF2 = propagateScales(proptype, F2, sImage2, weight_func );
+newF3 = propagateScales(proptype, F3, sImage3, weight_func );
+features_1 = dn_sift(sImage1, newF1);
+features_2 = dn_sift(sImage2, newF2);
+features_3 = dn_sift(sImage1, newF3);
+disp('end')
+
+features = cat(2,features_1,features_2,features_3);
+features = double(features);
+
+%%
+ff = imds_train.Files;
+[m,n] = size(ff)
+
+
+for i = 1:m
+    disp(ff{1})
+end
+
