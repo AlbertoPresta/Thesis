@@ -7,24 +7,7 @@ from numpy.fft import fft2, ifft2
 
 
 
-def crop_image(img_path,new_width = 400, new_height = 400):
-    img = cv2.imread(img_path)
-    print("original_shape: ",img.shape)
-    img = cv2.resize(img,(1000,1000))
-    #plt.imshow(img)
-    #print(img.shape)
-    height, width,_ = img.shape
-    height = height//2
-    width = width//2
 
-    left = (width - new_width)
-    top = (height - new_height)
-    right = (width + new_width)
-    bottom = (height + new_height)
-    print(left,right,top,bottom)
-
-    img = img[top:bottom,left:right,:]
-    return img
 
 
 def bitget(number, pos):
@@ -60,7 +43,7 @@ def gabor_filter_fixed_scale(mask, x, y, fftRows, fftCols, noOrientatations, rat
 
         gb =  np.multiply(np.exp(-.5*(np.power(x_theta,2)/sigma**2+np.power(y_theta,2)/(ratio * sigma)**2)),np.cos(np.multiply(2*math.pi/lamb,x_theta)))
 
-        #print(gb.shape)
+
 
         total = np.sum(np.sum(np.multiply(gb,mask)))
         meanInner = total / np.sum(np.sum(mask))
@@ -68,7 +51,7 @@ def gabor_filter_fixed_scale(mask, x, y, fftRows, fftCols, noOrientatations, rat
         evenGabor = np.multiply(gb,mask,dtype = "complex_")
 
         gb = np.multiply(np.exp(-.5*(np.power(x_theta,2)/sigma**2+np.power(y_theta,2)/(ratio * sigma)**2)),np.sin(np.multiply(2*math.pi/lamb,x_theta)))
-        #print(gb.shape)
+
         total = np.sum(np.sum(np.multiply(gb,mask)))
         meanInner = total / np.sum(np.sum(mask))
         gb = gb - np.mean(meanInner)
